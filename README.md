@@ -1,7 +1,4 @@
 # HazeMatching
-Code for our CVPR 2026 (Findings) paper https://arxiv.org/abs/2506.22397.
-
-# 🌫️ HazeMatching
 
 **A fast and effective posterior sampling framework for microscopy image dehazing**
 
@@ -39,13 +36,13 @@ Unlike one-shot restoration models, it generates **multiple plausible reconstruc
 ### Input → Reconstruction → Ground Truth
 
 <p align="center">
-  <img src="assets/Teaser_main.pdf" width="80%">
+  <img src="assets/Teaser.png" width="80%">
 </p>
 
 ### Posterior Samples
 
 <p align="center">
-  <img src="assets/posterior_samples.png" width="80%">
+  <img src="assets/care_test_2.gif" width="80%">
 </p>
 
 ---
