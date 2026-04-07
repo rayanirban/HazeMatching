@@ -31,9 +31,7 @@ Unlike one-shot restoration models, it generates **multiple plausible reconstruc
 
 ---
 
-## 🖼️ Visual Results
-
-### Input → Reconstruction → Ground Truth
+## 🖼️ Teaser
 
 <p align="center">
   <img src="assets/Teaser.png" width="80%">
@@ -42,16 +40,14 @@ Unlike one-shot restoration models, it generates **multiple plausible reconstruc
 ### Posterior Samples
 
 <p align="center">
-  <img src="assets/care_test_2.gif" width="80%">
+  <img src="assets/care_test_2.gif" width="40%">
 </p>
 
 ---
 
 ## 📄 Paper
 
-> *HazeMatching: Fast Posterior Sampling for Microscopy Image Dehazing*
-
-📌 [Paper link coming soon]
+> *HazeMatching: Fast Posterior Sampling for Microscopy Image Dehazing* [https://arxiv.org/abs/2506.22397](https://arxiv.org/abs/2506.22397)
 
 If you use this work, please consider citing:
 
@@ -59,9 +55,8 @@ If you use this work, please consider citing:
 @inproceedings{ray2026hazematching,
   title     = {HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching},
   author    = {Ray, Anirban and Ashesh, Ashesh and Jug, Florian},
-  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
-  year      = {2026},
-  note      = {Findings of CVPR 2026}
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition - FINDINGS Track},
+  year      = {2026}
 }
 ```
 
@@ -69,13 +64,7 @@ If you use this work, please consider citing:
 
 ## 🙌 Acknowledgements
 
-We thank Francesca Casagrande, Alessandra Fasciani, Jacopo Zasso, Ilaria Laface, Dario Ricca, and Eugenia Cammarota for their valuable contributions to this work. We
-also acknowledge the support of Talley Lambert (Harvard Medical School) and Vera Galinova in setting up the
-microsim pipeline and some baselines, as well as the
-entire Jug Group for insightful discussions. This work
-was supported by the European Union through the Horizon Europe program (IMAGINE project, grant agreement
-101094250-IMAGINE and AI4Life project, grant agreement 101057970-AI4LIFE) and the generous core funding
-of Human Technopole.
+We thank Francesca Casagrande, Alessandra Fasciani, Jacopo Zasso, Ilaria Laface, Dario Ricca, and Eugenia Cammarota for their valuable contributions to this work. We also acknowledge the support of [Talley Lambert](https://talleylambert.com/){target="_blank"} (Harvard Medical School) and Vera Galinova in setting up the [microsim](https://talleylambert.com/microsim/){target="_blank"} pipeline and some baselines, as well as the entire [Jug Group](https://humantechnopole.it/en/research-groups/jug-group/){target="_blank"} for insightful discussions. This work was supported by the European Union through the Horizon Europe program (IMAGINE project, grant agreement 101094250-IMAGINE and AI4Life project, grant agreement 101057970-AI4LIFE) and the generous core funding of [Human Technopole](https://humantechnopole.it/en/){target="_blank"}.
 
 ---
 
