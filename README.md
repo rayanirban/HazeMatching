@@ -47,7 +47,7 @@ Unlike one-shot restoration models, it generates **multiple plausible reconstruc
 
 ## 📄 Paper
 
-> *HazeMatching: Fast Posterior Sampling for Microscopy Image Dehazing* [https://arxiv.org/abs/2506.22397](https://arxiv.org/abs/2506.22397)
+> *HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching* [https://arxiv.org/abs/2506.22397](https://arxiv.org/abs/2506.22397)
 
 If you use this work, please consider citing:
 
@@ -56,6 +56,7 @@ If you use this work, please consider citing:
   title     = {HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching},
   author    = {Ray, Anirban and Ashesh, Ashesh and Jug, Florian},
   booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition - FINDINGS Track},
+  note      = {to appear},
   year      = {2026}
 }
 ```
