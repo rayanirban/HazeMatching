@@ -8,11 +8,12 @@ HazeMatching uses guided conditional flow matching to generate multiple plausibl
 
 ## Key Features
 
-- Fast posterior sampling, substantially faster than diffusion-style samplers.
-- High-quality reconstructions with strong PSNR and LPIPS performance.
-- Multiple stochastic samples per input for uncertainty-aware analysis.
-- Calibration tools for uncertainty quantification.
-- Training, inference, metric, calibration, dataset download, and checkpoint download scripts.
+### ✨ Key Features
+
+* ⚡ **Fast sampling**: Orders of magnitude faster than diffusion models
+* 🎯 **High-quality reconstructions**: Strong PSNR and LPIPS performance
+* 🔁 **Posterior sampling**: Generate diverse outputs instead of a single estimate
+* 🔬 **Calibrated uncertainty quantification**: Provides uncertainty estimates for downstream analysis
 
 ## Posterior Samples
 
