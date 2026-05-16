@@ -16,9 +16,12 @@ from hazematching.datasets import DATASET_DESCRIPTIONS, SUBSETS, canonical_subse
 
 BASE_URL = "https://download.fht.org/jug/hazematching/checkpoints/"
 
-# Fill the hash field when the final checkpoints are published.
 MODELS: dict[str, dict[str, str | None]] = {
-    key: {"best_model.pth": None} for key in SUBSETS
+    "zebrafish": {"best_model.pth": "sha256:9e3bdfcdce89ed7d93d8cbc189e00d05d44c2b35c03934e1235ffe7104684cb4"},
+    "organoids1": {"best_model.pth": "sha256:0757e308aff6f9fe3ed619a3ce190ab7210e9ed2fdfb002c2ef47752d126e0b6"},
+    "organoids2": {"best_model.pth": "sha256:329621425efcdc37063701daf3d2b7ea26f006557e3a57a08d17258d22a874d6"},
+    "microtubule": {"best_model.pth": "sha256:20344df5748f3eb36294d80bed67be52a37c095d5d7138d8ec16dceca7a2875a"},
+    "neuron": {"best_model.pth": "sha256:2158fe4df870540885d3691cb3ec41b6db5482786106a5f03f24aedfead302e9"},
 }
 
 app = typer.Typer()

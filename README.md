@@ -49,7 +49,7 @@ Supported dataset keys:
 | `microtubule` | Microtubule |
 | `neuron` | Neuron |
 
-By default, data is expected under `data/<subset>/` with split folders such as `train_crop/`, `val_crop/`, `test/`, and `val/`.
+By default, data is expected under `data/<subset>/`. Most subsets use `train_crop/`, `val_crop/`, `test/`, and `val/`; neuron data uses `train/`, `val/`, and `test/`.
 
 ## Reproducing Results
 

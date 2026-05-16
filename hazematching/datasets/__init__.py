@@ -2,7 +2,9 @@ from .config import (
     DATASET_DESCRIPTIONS,
     SUBSETS,
     canonical_subset,
+    fid_reference_folder,
     format_subset_options,
+    training_split_folder,
 )
 from .data_norm import normalize, denormalize, STATS
 
@@ -13,8 +15,10 @@ __all__ = [
     "HazeDataset",
     "canonical_subset",
     "denormalize",
+    "fid_reference_folder",
     "format_subset_options",
     "normalize",
+    "training_split_folder",
 ]
 
 

@@ -11,7 +11,11 @@ from torchmetrics.image import MultiScaleStructuralSimilarityIndexMeasure
 from tqdm import tqdm
 import typer
 
-from hazematching.datasets import canonical_subset, format_subset_options
+from hazematching.datasets import (
+    canonical_subset,
+    fid_reference_folder,
+    format_subset_options,
+)
 from hazematching.ra_psnr import RangeInvariantPsnr
 from hazematching.utils import (
     lpips,
@@ -41,7 +45,10 @@ def compute_metrics(
     fid_dir: Annotated[
         Optional[Path],
         typer.Option(
-            help="Directory of FID reference crops. Defaults to <data_dir>/<subset>/train_crops_fid/."
+            help=(
+                "Directory of FID reference samples. Defaults to "
+                "<data_dir>/<subset>/train_crops_fid, or train for neuron data."
+            )
         ),
     ] = None,
     data_dir: Annotated[
@@ -61,7 +68,7 @@ def compute_metrics(
     if results_dir is None:
         results_dir = subset_dir / "test_results"
     if fid_dir is None:
-        fid_dir = subset_dir / "train_crops_fid"
+        fid_dir = subset_dir / fid_reference_folder(subset)
 
     micros_ms3im = MicroMS3IM()
 
@@ -152,6 +159,7 @@ def compute_metrics(
     lpips_score = lpips(gts, outputs)
     fid = fid_score(fid_crops_gts, outputs)
     gmsd_scores = GMSD(outputs, gts)
+    gmsd_mean = torch.mean(gmsd_scores)
     entropy_scores = entropy(outputs)
 
     average_ind_fsim = torch.mean(torch.stack(ind_fsims))
@@ -177,7 +185,18 @@ def compute_metrics(
     # ── Print ────────────────────────────────────────────────────────────────
     typer.echo(f"\n=== {subset.upper()} (n={n_samples}) ===")
     typer.echo(f"PSNR:         {average_psnr.item():.4f} ± {std_psnr.item():.4f}")
+    typer.echo(
+        f"MS-SSIM:      {average_ms_ssim.item():.4f} ± {std_ms_ssim.item():.4f}"
+    )
     typer.echo(f"MicroMS3IM:   {average_micro3_ssim:.4f} ± {std_micro3_ssim:.4f}")
+    typer.echo(f"FSIM  (MMSE): {fsim_mean.item():.4f}")
+    typer.echo(
+        f"FSIM  (Ind):  {average_ind_fsim.item():.4f} ± {std_ind_fsim.item():.4f}"
+    )
+    typer.echo(f"GMSD  (MMSE): {gmsd_mean.item():.4f}")
+    typer.echo(
+        f"GMSD  (Ind):  {average_ind_gmsd.item():.4f} ± {std_ind_gmsd.item():.4f}"
+    )
     typer.echo(f"LPIPS (MMSE): {lpips_score:.4f}")
     typer.echo(
         f"LPIPS (Ind):  {average_ind_lpips.item():.4f} ± {std_ind_lpips.item():.4f}"
