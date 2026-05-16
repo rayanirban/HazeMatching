@@ -118,7 +118,7 @@ def build_notebook() -> dict:
 
             from hazematching import CCFMFlowMatcher, CCFMUNet, odeint
             from hazematching.calibration import Calibration, plot_calibration
-            from hazematching.datasets import HazeDataset
+            from hazematching.datasets import HazeDataset, training_split_folder
             from hazematching.datasets.data_norm import denormalize, normalize
             from hazematching.ra_psnr import RangeInvariantPsnr
             from hazematching.utils import FSIM, GMSD, extract_patches_inner, lpips, reconstruct_image_inner
@@ -225,7 +225,7 @@ def build_notebook() -> dict:
 
             The next cell does two things:
 
-            - it loads one **training crop**, which is the small patch used during optimization,
+            - it loads one **training sample**, which is the data used during optimization,
             - and it loads one **full test image**, which is the larger image used for inference.
 
             We show the widefield input and the confocal target side by side.
@@ -234,8 +234,14 @@ def build_notebook() -> dict:
         ),
         code(
             """
-            train_set = HazeDataset(SUBSET, DATA_DIR / SUBSET / "train_crop")
-            val_set = HazeDataset(SUBSET, DATA_DIR / SUBSET / "val_crop")
+            train_set = HazeDataset(
+                SUBSET,
+                DATA_DIR / SUBSET / training_split_folder(SUBSET, "train"),
+            )
+            val_set = HazeDataset(
+                SUBSET,
+                DATA_DIR / SUBSET / training_split_folder(SUBSET, "val"),
+            )
 
             train_example = train_set[0].numpy()
             first_test_file = sorted((DATA_DIR / SUBSET / "test").glob("*.tif"))[0]
@@ -244,9 +250,9 @@ def build_notebook() -> dict:
             fig, axes = plt.subplots(2, 2, figsize=(10, 9))
 
             axes[0, 0].imshow(train_example[1], cmap="magma")
-            axes[0, 0].set_title("Training crop: widefield input")
+            axes[0, 0].set_title("Training sample: widefield input")
             axes[0, 1].imshow(train_example[0], cmap="magma")
-            axes[0, 1].set_title("Training crop: confocal target")
+            axes[0, 1].set_title("Training sample: confocal target")
 
             axes[1, 0].imshow(full_example[1], cmap="magma")
             axes[1, 0].set_title(f"Full image widefield input: {first_test_file.name}")
@@ -259,8 +265,8 @@ def build_notebook() -> dict:
             plt.tight_layout()
             plt.show()
 
-            print(f"Number of training crops : {len(train_set)}")
-            print(f"Number of validation crops: {len(val_set)}")
+            print(f"Number of training samples  : {len(train_set)}")
+            print(f"Number of validation samples: {len(val_set)}")
             print(f"Full image shape          : {full_example.shape}")
             """
         ),

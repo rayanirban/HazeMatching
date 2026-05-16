@@ -11,7 +11,11 @@ from torchmetrics.image import MultiScaleStructuralSimilarityIndexMeasure
 from tqdm import tqdm
 import typer
 
-from hazematching.datasets import canonical_subset, format_subset_options
+from hazematching.datasets import (
+    canonical_subset,
+    fid_reference_folder,
+    format_subset_options,
+)
 from hazematching.ra_psnr import RangeInvariantPsnr
 from hazematching.utils import (
     lpips,
@@ -41,7 +45,10 @@ def compute_metrics(
     fid_dir: Annotated[
         Optional[Path],
         typer.Option(
-            help="Directory of FID reference crops. Defaults to <data_dir>/<subset>/train_crops_fid (train_crop for neuron data)/."
+            help=(
+                "Directory of FID reference samples. Defaults to "
+                "<data_dir>/<subset>/train_crops_fid, or train for neuron data."
+            )
         ),
     ] = None,
     data_dir: Annotated[
@@ -61,11 +68,7 @@ def compute_metrics(
     if results_dir is None:
         results_dir = subset_dir / "test_results"
     if fid_dir is None:
-        # The 'neuron' dataset uses a different folder name for FID references
-        if subset == "neuron":
-            fid_dir = subset_dir / "train_crop"
-        else:
-            fid_dir = subset_dir / "train_crops_fid"
+        fid_dir = subset_dir / fid_reference_folder(subset)
 
     micros_ms3im = MicroMS3IM()
 

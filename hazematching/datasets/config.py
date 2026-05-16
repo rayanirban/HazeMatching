@@ -38,3 +38,22 @@ def canonical_subset(subset: str) -> str:
 
 def format_subset_options() -> str:
     return ", ".join(SUBSETS)
+
+
+def training_split_folder(subset: str, split: str) -> str:
+    subset = canonical_subset(subset)
+    if split not in {"train", "val"}:
+        raise ValueError(f"training split must be 'train' or 'val', got {split!r}")
+
+    if subset == "neuron":
+        return split
+
+    return f"{split}_crop"
+
+
+def fid_reference_folder(subset: str) -> str:
+    subset = canonical_subset(subset)
+    if subset == "neuron":
+        return "train"
+
+    return "train_crops_fid"

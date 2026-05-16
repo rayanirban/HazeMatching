@@ -14,6 +14,7 @@ from hazematching.datasets import (
     HazeDataset,
     canonical_subset,
     format_subset_options,
+    training_split_folder,
 )
 
 app = typer.Typer()
@@ -65,8 +66,10 @@ def train(
     save_dir.mkdir(parents=True, exist_ok=True)
 
     # ── Data ────────────────────────────────────────────────────────────────
-    train_set = HazeDataset(subset, subset_dir / "train_crop")
-    val_set = HazeDataset(subset, subset_dir / "val_crop")
+    train_set = HazeDataset(
+        subset, subset_dir / training_split_folder(subset, "train")
+    )
+    val_set = HazeDataset(subset, subset_dir / training_split_folder(subset, "val"))
     train_loader = DataLoader(
         train_set, batch_size=batch_size, shuffle=True, drop_last=True
     )

@@ -14,7 +14,7 @@ class HazeDataset(data.Dataset):
 
     Args:
         subset: One of the HazeMatching dataset keys.
-        folder: Directory containing image crops.
+        folder: Directory containing paired TIFF samples.
         returns: Channel indices to include in each sample, e.g. ``[0, 1]``
             for confocal target and widefield input.
     """
