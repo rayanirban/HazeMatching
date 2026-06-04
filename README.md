@@ -1,5 +1,9 @@
+# HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching
 
-# HazeMatching
+[![arXiv](https://img.shields.io/badge/arXiv-2506.22397-b31b1b.svg)](https://arxiv.org/abs/2506.22397)
+
+**Authors:** [Anirban Ray](https://rayanirban.github.io/) et al.  
+**Venue:** IEEE/CVF CVPR 2026 (Findings)
 
 **A fast and effective posterior sampling framework for reconstructing confocal targets from widefield microscopy inputs.**
 
