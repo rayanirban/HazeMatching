@@ -34,7 +34,7 @@ HazeMatching uses guided conditional flow matching to generate multiple plausibl
 </p>
 
 ## Installation
-
+After cloning the repo, run:
 ```bash
 pip install uv
 uv sync
@@ -153,11 +153,6 @@ uv run python scripts/metrics.py zebrafish
 uv run python scripts/calibrate.py zebrafish --results-dir data/zebrafish
 ```
 
-## Paper
-
-*HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching*  
-[https://arxiv.org/abs/2506.22397](https://arxiv.org/abs/2506.22397)
-
 If you use this work, please cite:
 
 ```bibtex
@@ -165,7 +160,6 @@ If you use this work, please cite:
   title     = {HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching},
   author    = {Ray, Anirban and Ashesh, Ashesh and Jug, Florian},
   booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition - FINDINGS Track},
-  note      = {to appear},
   year      = {2026}
 }
 ```
