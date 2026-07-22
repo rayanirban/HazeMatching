@@ -170,6 +170,38 @@ We thank Francesca Casagrande, Alessandra Fasciani, Jacopo Zasso, Ilaria Laface,
 
 This work was supported by the European Union through the Horizon Europe program (IMAGINE project, grant agreement 101094250-IMAGINE and AI4Life project, grant agreement 101057970-AI4LIFE) and the generous core funding of [Human Technopole](https://humantechnopole.it/en/).
 
+## ⚠️ Manual Download of Datasets and Pre-trained Models
+
+If downloading the datasets or pretrained models using the provided script results in an error, you can download them manually from the following link:
+
+**Datasets and pretrained models:** [Zenodo download link](https://zenodo.org/records/21492506)
+
+After downloading, extract the files and place them in the appropriate dataset and model directories used by HazeMatching.
+
+### Model file names
+
+The downloaded best-model checkpoints may include the dataset name as a prefix. For example:
+
+```text
+ccp_best_model.pth
+```
+
+Before placing a checkpoint in its corresponding model directory, remove the dataset-name prefix so that the file is named:
+
+```text
+best_model.pth
+```
+
+For example:
+
+```text
+ccp_best_model.pth  →  best_model.pth
+```
+
+Place each renamed checkpoint inside the directory corresponding to that dataset. Do not place all renamed `best_model.pth` files in the same directory, as they would overwrite one another.
+
+Similarly, place each manually downloaded dataset in the appropriate dataset directory expected by the project.
+
 ## License
 
 MIT
