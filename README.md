@@ -69,6 +69,30 @@ There are two main workflows, depending on whether you want to train from scratc
 
 Metrics are reproducible from provided checkpoints. Full retraining may produce slight variation due to non-deterministic operations.
 
+### Reproducible Inference Seeds
+
+By default, `scripts/infer.py` initializes each posterior sample from freshly drawn random noise. To reproduce the exact inference samples used for the paper results, run inference with `--reproducible` and keep the default `--n-samples 50`.
+
+```bash
+uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best_model.pth --reproducible
+```
+
+On first use, this downloads `{subset}_test_val_seeds.zip` from Zenodo and extracts it under `data/<subset>/` by default. The seed archives are fetched from:
+
+```text
+https://zenodo.org/records/21705000/files/{subset}_test_val_seeds.zip?download=1
+```
+
+```text
+data/<subset>/
+  test_seeds/
+    <test image filename>.tif
+  val_seeds/
+    <val image filename>.tif
+```
+
+Each seed TIFF is named exactly like the matching `test/` or `val/` image and stores the 50 noise initializations with shape `[50, 1, 1, X, Y]`. During reproducible inference, these saved noise images are used instead of random initialization. The reproducibility archives contain seeds only for the `test` and `val` splits; requesting more than 50 samples is not supported because only 50 saved seeds exist. If you download or extract the seeds yourself, place `test_seeds/` and `val_seeds/` in `data/<subset>/`, or pass their parent directory with `--seed-dir`.
+
 ### Option A: Train From Scratch
 
 1. Download data.
@@ -98,6 +122,12 @@ uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best
 ```
 
 Inference writes multi-sample TIFFs to `data/zebrafish/test_results/` and `data/zebrafish/val_results/`.
+
+For paper-result reproducibility, run:
+
+```bash
+uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best_model.pth --reproducible
+```
 
 4. Compute metrics.
 
@@ -141,6 +171,8 @@ Checkpoints are saved to `checkpoints/<subset>/best_model.pth` by default.
 uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best_model.pth
 ```
 
+For paper-result reproducibility, add `--reproducible` to the inference command.
+
 4. Compute metrics.
 
 ```bash
@@ -174,7 +206,7 @@ This work was supported by the European Union through the Horizon Europe program
 
 If downloading the datasets or pretrained models using the provided script results in an error, you can download them manually from the following link:
 
-**Datasets and pretrained models:** [Zenodo download link](https://zenodo.org/records/21492506)
+**Datasets and pretrained models:** [Zenodo download link](https://zenodo.org/records/21705000)
 
 After downloading, extract the files and place them in the appropriate dataset and model directories used by HazeMatching.
 
