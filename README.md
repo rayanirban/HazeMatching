@@ -69,9 +69,9 @@ There are two main workflows, depending on whether you want to train from scratc
 
 Metrics are reproducible from provided checkpoints. Full retraining may produce slight variation due to non-deterministic operations.
 
-### Reproducible Inference Seeds
+### Stiched Inference Seeds
 
-By default, `scripts/infer.py` initializes each posterior sample from freshly drawn random noise. To reproduce the exact inference samples used for the paper results, run inference with `--reproducible` and keep the default `--n-samples 50`.
+By default, `scripts/infer.py` initializes each posterior sample using freshly drawn random noise. We also provide the stitched initial-noise images (`t=0`) used to initialize the ODE integration in the paper. To use these saved noise images, run inference with the `--reproducible` flag while keeping the default `--n-samples 50`.
 
 ```bash
 uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best_model.pth --reproducible
