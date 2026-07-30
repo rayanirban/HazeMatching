@@ -125,7 +125,7 @@ uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best
 
 Inference writes multi-sample TIFFs to `data/zebrafish/test_results/` and `data/zebrafish/val_results/`.
 
-For paper-result reproducibility, run:
+Inference with noise seed from the stiched reproducible seeds can be done with:
 
 ```bash
 uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best_model.pth --reproducible
@@ -173,7 +173,7 @@ Checkpoints are saved to `checkpoints/<subset>/best_model.pth` by default.
 uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best_model.pth
 ```
 
-For paper-result reproducibility, add `--reproducible` to the inference command.
+For inference with noise seed from the stiched reproducible seeds, add `--reproducible` to the inference command.
 
 4. Compute metrics.
 
@@ -186,23 +186,6 @@ uv run python scripts/metrics.py zebrafish
 ```bash
 uv run python scripts/calibrate.py zebrafish --results-dir data/zebrafish
 ```
-
-If you use this work, please cite:
-
-```bibtex
-@inproceedings{ray2026hazematching,
-  title     = {HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching},
-  author    = {Ray, Anirban and Ashesh, Ashesh and Jug, Florian},
-  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition - FINDINGS Track},
-  year      = {2026}
-}
-```
-
-## Acknowledgements
-
-We thank Francesca Casagrande, Alessandra Fasciani, Jacopo Zasso, Ilaria Laface, Dario Ricca, and Eugenia Cammarota for their valuable contributions to this work. We also acknowledge the support of [Talley Lambert](https://talleylambert.com/) at Harvard Medical School and Vera Galinova in setting up the [microsim](https://talleylambert.com/microsim/) pipeline and some baselines, as well as the entire [Jug Group](https://humantechnopole.it/en/research-groups/jug-group/) for insightful discussions.
-
-This work was supported by the European Union through the Horizon Europe program (IMAGINE project, grant agreement 101094250-IMAGINE and AI4Life project, grant agreement 101057970-AI4LIFE) and the generous core funding of [Human Technopole](https://humantechnopole.it/en/).
 
 ## ⚠️ Manual Download of Datasets and Pre-trained Models
 
@@ -235,6 +218,23 @@ neuron_best_model.pth  →  best_model.pth
 Place each renamed checkpoint inside the directory corresponding to that dataset. Do not place all renamed `best_model.pth` files in the same directory, as they would overwrite one another.
 
 Similarly, place each manually downloaded dataset in the appropriate dataset directory expected by the project.
+
+If you use this work, please cite:
+
+```bibtex
+@inproceedings{ray2026hazematching,
+  title     = {HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching},
+  author    = {Ray, Anirban and Ashesh, Ashesh and Jug, Florian},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition - FINDINGS Track},
+  year      = {2026}
+}
+```
+
+## Acknowledgements
+
+We thank Francesca Casagrande, Alessandra Fasciani, Jacopo Zasso, Ilaria Laface, Dario Ricca, and Eugenia Cammarota for their valuable contributions to this work. We also acknowledge the support of [Talley Lambert](https://talleylambert.com/) at Harvard Medical School and Vera Galinova in setting up the [microsim](https://talleylambert.com/microsim/) pipeline and some baselines, as well as the entire [Jug Group](https://humantechnopole.it/en/research-groups/jug-group/) for insightful discussions.
+
+This work was supported by the European Union through the Horizon Europe program (IMAGINE project, grant agreement 101094250-IMAGINE and AI4Life project, grant agreement 101057970-AI4LIFE) and the generous core funding of [Human Technopole](https://humantechnopole.it/en/).
 
 ## License
 
