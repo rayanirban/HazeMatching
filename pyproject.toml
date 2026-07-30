@@ -2,20 +2,20 @@
 name = "hazematching"
 version = "0.1.0"
 description = "HazeMatching: Dehazing Light Microscopy Images with Guided Conditional Flow Matching"
-requires-python = ">=3.10"
+requires-python = ">=3.12.0"
 dependencies = [
     "torch>=2.0",
     "torchvision",
     "torchdiffeq",
     "torchdyn",
-    "torchmetrics[image]",
+    "torchmetrics==1.6.1",
     "tifffile",
-    "numpy",
+    "numpy==1.26.4",
     "matplotlib",
     "tqdm",
     "wandb",
     "pyiqa",
-    "microssim",
+    "microssim==0.0.2",
     "POT",
     "scipy",
     "torchcfm",
