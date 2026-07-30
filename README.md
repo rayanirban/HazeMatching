@@ -93,7 +93,7 @@ data/<subset>/
 
 Each seed TIFF is named exactly like the matching `test/` or `val/` image and stores the 50 noise initializations with shape `[50, 1, 1, X, Y]`. During reproducible inference, these saved noise images are used instead of random initialization. The reproducibility archives contain seeds only for the `test` and `val` splits; requesting more than 50 samples is not supported because only 50 saved seeds exist. If you download or extract the seeds yourself, place `test_seeds/` and `val_seeds/` in `data/<subset>/`, or pass their parent directory with `--seed-dir`.
 
-The seed TIFFs store the stitched initial-noise images for the retained central `64 x 64` regions of each posterior sample. They are useful for visualization, inspection, and downstream reproducibility, but not as complete patch-level random states: inference used `128 x 128` patches (`64 x 64` for the `neuron` datset), and the discarded border noise is unavailable, so exact trajectory replay is not guaranteed.
+The seed TIFFs store the stitched initial-noise images for the retained central `64 x 64` regions of each posterior sample. They are useful for visualization, inspection, and downstream reproducibility, but not as complete patch-level random states: inference used `128 x 128` patches (`64 x 64` for the `neuron` dataset), and the discarded border noise is unavailable, so exact trajectory replay is not guaranteed. Together with the model, inference settings, inputs, and saved predictions, they support a close approximation of the reported results and downstream analyses. Full posterior-sample result stacks used to compute the reported results are available upon request.
 
 ### Option A: Train From Scratch
 
