@@ -69,7 +69,7 @@ There are two main workflows, depending on whether you want to train from scratc
 
 Metrics are reproducible from provided checkpoints. Full retraining may produce slight variation due to non-deterministic operations.
 
-### Stiched Inference Seeds
+### Stitched Inference Seeds
 
 By default, `scripts/infer.py` initializes each posterior sample using freshly drawn random noise. We also provide the stitched initial-noise images (`t=0`) used to initialize the ODE integration in the paper. To use these saved noise images, run inference with the `--reproducible` flag while keeping the default `--n-samples 50`.
 
@@ -93,7 +93,31 @@ data/<subset>/
 
 Each seed TIFF is named exactly like the matching `test/` or `val/` image and stores the 50 noise initializations with shape `[50, 1, 1, X, Y]`. During reproducible inference, these saved noise images are used instead of random initialization. The reproducibility archives contain seeds only for the `test` and `val` splits; requesting more than 50 samples is not supported because only 50 saved seeds exist. If you download or extract the seeds yourself, place `test_seeds/` and `val_seeds/` in `data/<subset>/`, or pass their parent directory with `--seed-dir`.
 
-The seed TIFFs store the stitched initial-noise images for the retained central `64 x 64` regions of each posterior sample. They are useful for visualization, inspection, and downstream reproducibility, but not as complete patch-level random states: inference used `128 x 128` patches (`64 x 64` for the `neuron` dataset), and the discarded border noise is unavailable, so exact trajectory replay is not guaranteed. Full posterior-sample result stacks used to compute the reported results are available upon request.
+The seed TIFFs store the stitched initial-noise images for the retained central `64 x 64` regions of each posterior sample. They are useful for visualization, inspection, and downstream reproducibility, but not as complete patch-level random states: inference used `128 x 128` patches (`64 x 64` for the `neuron` dataset), and the discarded border noise is unavailable, so exact trajectory replay is not guaranteed.
+
+### Paper Result Samples
+
+The full posterior-sample result stacks used to compute the paper metrics are available from Zenodo. To download those saved stacks and evaluate the reported test metrics directly, make sure the dataset is present under `data/<subset>/`, then run:
+
+```bash
+uv run python scripts/metrics.py zebrafish --paper-results
+```
+
+On first use, this downloads `{subset}_test_val_result_samples.zip` from Zenodo and extracts it under `data/<subset>/` by default. The result-sample archives are fetched from:
+
+```text
+https://zenodo.org/records/21718912/files/{subset}_test_val_result_samples.zip?download=1
+```
+
+```text
+data/<subset>/
+  test_result_samples/
+    <test image filename>.tif
+  val_result_samples/
+    <val image filename>.tif
+```
+
+Each result TIFF is named exactly like the matching `test/` or `val/` image and stores 50 posterior samples with shape `[50, 1, 1, X, Y]`. With `--paper-results`, `scripts/metrics.py` evaluates `test_result_samples/` by default; pass `--results-dir data/<subset>/val_result_samples` to evaluate the validation stacks instead.
 
 ### Option A: Train From Scratch
 
@@ -125,7 +149,7 @@ uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best
 
 Inference writes multi-sample TIFFs to `data/zebrafish/test_results/` and `data/zebrafish/val_results/`.
 
-Inference with noise seed from the stiched reproducible seeds can be done with:
+Inference with noise seed from the stitched reproducible seeds can be done with:
 
 ```bash
 uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best_model.pth --reproducible
@@ -173,7 +197,7 @@ Checkpoints are saved to `checkpoints/<subset>/best_model.pth` by default.
 uv run python scripts/infer.py zebrafish --checkpoint checkpoints/zebrafish/best_model.pth
 ```
 
-For inference with noise seed from the stiched reproducible seeds, add `--reproducible` to the inference command.
+For inference with noise seed from the stitched reproducible seeds, add `--reproducible` to the inference command.
 
 4. Compute metrics.
 
@@ -191,7 +215,7 @@ uv run python scripts/calibrate.py zebrafish --results-dir data/zebrafish
 
 If downloading the datasets or pretrained models using the provided script results in an error, you can download them manually from the following link:
 
-**Datasets and pretrained models:** [Zenodo download link](https://zenodo.org/records/21705000)
+**Datasets and pretrained models:** [Zenodo download link](https://zenodo.org/records/21718912)
 
 After downloading, extract the files and place them in the appropriate dataset and model directories used by HazeMatching.
 
