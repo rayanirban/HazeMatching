@@ -1,9 +1,11 @@
 import os
 import warnings
+import zipfile
 from pathlib import Path
 from typing import Annotated, Optional
 
 import numpy as np
+import pooch
 import torch
 from microssim import MicroMS3IM
 from tifffile import imread, TiffFile
@@ -29,6 +31,107 @@ from hazematching.utils import (
 warnings.filterwarnings("ignore")
 
 app = typer.Typer()
+
+PAPER_RESULT_BASE_URL = "https://zenodo.org/records/21718912/files"
+PAPER_RESULT_FOLDERS = ("test", "val")
+
+
+def _paper_result_archive_filename(subset: str) -> str:
+    return f"{subset}_test_val_result_samples.zip"
+
+
+def _paper_result_archive_url(subset: str) -> str:
+    filename = _paper_result_archive_filename(subset)
+    return f"{PAPER_RESULT_BASE_URL}/{filename}?download=1"
+
+
+def _paper_result_folder(folder: str) -> str:
+    return f"{folder}_result_samples"
+
+
+def _has_paper_result_folders(result_dir: Path, folders: tuple[str, ...]) -> bool:
+    return all(
+        (result_dir / _paper_result_folder(folder)).is_dir() for folder in folders
+    )
+
+
+def _extract_zip_safely(zip_path: Path, dest: Path) -> None:
+    dest = dest.resolve()
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        for member in zf.infolist():
+            member_path = (dest / member.filename).resolve()
+            if member_path != dest and dest not in member_path.parents:
+                raise ValueError(
+                    f"Unsafe path in paper result archive: {member.filename}"
+                )
+        zf.extractall(dest)
+
+
+def _ensure_paper_result_samples(
+    subset: str,
+    result_dir: Path,
+    paper_result_archive_url: Optional[str],
+) -> None:
+    if _has_paper_result_folders(result_dir, PAPER_RESULT_FOLDERS):
+        return
+
+    filename = _paper_result_archive_filename(subset)
+    url = paper_result_archive_url or _paper_result_archive_url(subset)
+    result_dir.mkdir(parents=True, exist_ok=True)
+
+    typer.echo(f"Downloading paper result samples ({filename}) ...")
+    path = pooch.retrieve(
+        url=url,
+        known_hash=None,
+        fname=filename,
+        path=result_dir,
+        progressbar=True,
+    )
+
+    typer.echo(f"  Extracting to {result_dir} ...")
+    _extract_zip_safely(Path(path), result_dir)
+    Path(path).unlink(missing_ok=True)
+
+    if not _has_paper_result_folders(result_dir, PAPER_RESULT_FOLDERS):
+        expected = ", ".join(
+            _paper_result_folder(folder) for folder in PAPER_RESULT_FOLDERS
+        )
+        raise ValueError(
+            f"Paper result archive did not create the expected folder(s) in "
+            f"{result_dir}: {expected}"
+        )
+
+
+def _load_prediction_samples(result_path: Path, n_samples: int) -> np.ndarray:
+    with TiffFile(result_path) as tif:
+        image = tif.asarray()
+    image = image.astype("float32")
+
+    if image.ndim == 5 and image.shape[1:3] == (1, 1):
+        samples = image[:, 0, 0]
+    elif image.ndim == 4:
+        samples = image[:, 0] if image.shape[1] == 1 else image[:, -1]
+    elif image.ndim == 3:
+        samples = image
+    else:
+        raise ValueError(
+            f"Expected {result_path} to contain samples shaped "
+            f"(samples, steps, height, width), (samples, 1, 1, height, width), "
+            f"or (samples, height, width); got {image.shape}."
+        )
+
+    if samples.ndim != 3:
+        raise ValueError(
+            f"Expected {result_path} to reduce to (samples, height, width), "
+            f"got {samples.shape}."
+        )
+    if samples.shape[0] < n_samples:
+        raise ValueError(
+            f"Result stack {result_path} has {samples.shape[0]} samples, "
+            f"but n_samples={n_samples} was requested."
+        )
+
+    return samples[:n_samples]
 
 
 @app.command()
@@ -57,6 +160,28 @@ def compute_metrics(
     n_samples: Annotated[
         int, typer.Option(help="Number of samples to average for MMSE prediction.")
     ] = 50,
+    paper_results: Annotated[
+        bool,
+        typer.Option(
+            "--paper-results",
+            "--paper-result",
+            help=(
+                "Download and evaluate the archived posterior result samples used "
+                "for the paper. Results are extracted under <data_dir>/<subset>/ "
+                "and test_result_samples/ is used unless --results-dir is given."
+            ),
+        ),
+    ] = False,
+    paper_result_archive_url: Annotated[
+        Optional[str],
+        typer.Option(
+            "--paper-result-archive-url",
+            help=(
+                "Optional direct URL for the paper result sample zip. Defaults "
+                "to the HazeMatching Zenodo record."
+            ),
+        ),
+    ] = None,
 ):
     try:
         subset = canonical_subset(subset)
@@ -65,7 +190,19 @@ def compute_metrics(
         raise typer.Exit(1)
 
     subset_dir = data_dir / subset
-    if results_dir is None:
+    if paper_results:
+        try:
+            _ensure_paper_result_samples(
+                subset,
+                subset_dir,
+                paper_result_archive_url=paper_result_archive_url,
+            )
+        except Exception as exc:
+            typer.echo(f"Error: {exc}", err=True)
+            raise typer.Exit(1) from exc
+        if results_dir is None:
+            results_dir = subset_dir / _paper_result_folder("test")
+    elif results_dir is None:
         results_dir = subset_dir / "test_results"
     if fid_dir is None:
         fid_dir = subset_dir / fid_reference_folder(subset)
@@ -95,10 +232,7 @@ def compute_metrics(
     gt_dir = subset_dir / "test"
 
     for image_file in tqdm(image_files, desc="Images", leave=False):
-        with TiffFile(results_dir / image_file) as tif:
-            image = tif.asarray()
-
-        image_pred = image[:n_samples, -1]  # (n_samples, H, W)
+        image_pred = _load_prediction_samples(results_dir / image_file, n_samples)
         image_gt = imread(gt_dir / image_file).astype("float32")[0:1]  # (1, H, W)
         mmse_pred = np.mean(image_pred, axis=0, keepdims=True)
 
