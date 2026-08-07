@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore")
 
 app = typer.Typer()
 
-PAPER_RESULT_BASE_URL = "https://zenodo.org/records/21718912/files"
+PAPER_RESULT_BASE_URL = "https://zenodo.org/records/21838215/files"
 PAPER_RESULT_FOLDERS = ("test", "val")
 
 

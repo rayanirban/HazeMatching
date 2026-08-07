@@ -106,7 +106,7 @@ uv run python scripts/metrics.py zebrafish --paper-results
 On first use, this downloads `{subset}_test_val_result_samples.zip` from Zenodo and extracts it under `data/<subset>/` by default. The result-sample archives are fetched from:
 
 ```text
-https://zenodo.org/records/21718912/files/{subset}_test_val_result_samples.zip?download=1
+https://zenodo.org/records/21838215/files/{subset}_test_val_result_samples.zip?download=1
 ```
 
 ```text
@@ -215,7 +215,7 @@ uv run python scripts/calibrate.py zebrafish --results-dir data/zebrafish
 
 If downloading the datasets or pretrained models using the provided script results in an error, you can download them manually from the following link:
 
-**Datasets and pretrained models:** [Zenodo download link](https://zenodo.org/records/21718912)
+**Datasets and pretrained models:** [Zenodo download link](https://zenodo.org/records/21838215)
 
 After downloading, extract the files and place them in the appropriate dataset and model directories used by HazeMatching.
 

@@ -19,7 +19,7 @@ BASE_URL = "https://download.fht.org/jug/hazematching/data/"
 
 
 DATASETS: dict[str, tuple[str, str | None]] = {
-    "zebrafish": ("zebrafish.zip", "sha256:4a5e74dd0db583e3f082516cac17cd87f91c3df2327665a8a8f5bb295bc2ed87"),
+    "zebrafish": ("zebrafish.zip", "sha256:e672e711189733f9cca8dbc0da4cee43f4e47420fc649dc29ac9091756cd0b6e"),
     "organoids1": ("organoids1.zip", "sha256:96093963ba26a5f9525e7024db84e35e143983f025e58206318a76672114aad7"),
     "organoids2": ("organoids2.zip", "sha256:6a72eac8aaf9a92f23c5ca98a6f8b6129bccee7690beb6c00e309c575a9da544"),
     "microtubule": ("microtubule.zip", "sha256:15c682afaab73e7086d36230a68119f04185eceb0a48336f0097c3e7b4ad53d9"),
