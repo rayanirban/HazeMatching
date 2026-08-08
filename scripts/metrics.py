@@ -34,6 +34,11 @@ app = typer.Typer()
 
 PAPER_RESULT_BASE_URL = "https://zenodo.org/records/21838215/files"
 PAPER_RESULT_FOLDERS = ("test", "val")
+MICROTUBULE_CENTER_CROP = slice(56, -56)
+MICROTUBULE_RAW_SHAPE = (624, 624)
+MICROTUBULE_METRIC_SHAPE = (512, 512)
+DEFAULT_METRIC_PATCH_SIZE = 64
+NEURON_METRIC_PATCH_SIZE = 32
 
 
 def _paper_result_archive_filename(subset: str) -> str:
@@ -134,6 +139,67 @@ def _load_prediction_samples(result_path: Path, n_samples: int) -> np.ndarray:
     return samples[:n_samples]
 
 
+def _crop_microtubule_metric_region(image: np.ndarray, path: Path) -> np.ndarray:
+    if image.shape[-2:] == MICROTUBULE_METRIC_SHAPE:
+        return image
+    if image.shape[-2:] == MICROTUBULE_RAW_SHAPE:
+        return image[..., MICROTUBULE_CENTER_CROP, MICROTUBULE_CENTER_CROP]
+    raise ValueError(
+        f"Expected microtubule image {path} to have spatial shape "
+        f"{MICROTUBULE_RAW_SHAPE} or {MICROTUBULE_METRIC_SHAPE}, "
+        f"got {image.shape[-2:]}."
+    )
+
+
+def _metric_patch_size(subset: str) -> int:
+    if subset == "neuron":
+        return NEURON_METRIC_PATCH_SIZE
+    return DEFAULT_METRIC_PATCH_SIZE
+
+
+def _as_fid_crop_stack(image: np.ndarray, fid_path: Path) -> np.ndarray:
+    image = image.astype("float32")
+    if image.ndim == 2:
+        return image[np.newaxis, ...]
+    if image.ndim == 3:
+        return image
+    raise ValueError(
+        f"Expected FID reference {fid_path} to be shaped "
+        f"(height, width) or (crops, height, width), got {image.shape}."
+    )
+
+
+def _neuron_channel0(image: np.ndarray, fid_path: Path) -> np.ndarray:
+    image = image.astype("float32")
+    if image.ndim == 2:
+        return image
+
+    channel_axes = [axis for axis, size in enumerate(image.shape) if size <= 4]
+    for axis in channel_axes:
+        channel0 = np.squeeze(np.take(image, 0, axis=axis))
+        if channel0.ndim == 2:
+            return channel0
+
+    raise ValueError(
+        f"Expected neuron FID reference {fid_path} to contain a channel stack "
+        f"with channel 0 as a 2D image, got {image.shape}."
+    )
+
+
+def _load_fid_references(fid_dir: Path, subset: str) -> np.ndarray:
+    fid_files = sorted(f for f in os.listdir(fid_dir) if f.endswith(".tif"))
+    fid_crops = []
+    for fid_file in tqdm(fid_files, desc="Loading FID crops", leave=False):
+        fid_path = fid_dir / fid_file
+        with TiffFile(fid_path) as tif:
+            image = tif.asarray()
+        if subset == "neuron":
+            fid_crops.append(_neuron_channel0(image, fid_path)[np.newaxis, ...])
+        else:
+            fid_crops.append(_as_fid_crop_stack(image, fid_path))
+    return np.concatenate(fid_crops, axis=0)
+
+
 @app.command()
 def compute_metrics(
     subset: Annotated[
@@ -210,12 +276,7 @@ def compute_metrics(
     micros_ms3im = MicroMS3IM()
 
     # ── Load FID reference crops ─────────────────────────────────────────────
-    fid_files = sorted(f for f in os.listdir(fid_dir) if f.endswith(".tif"))
-    fid_crops = []
-    for fid_file in tqdm(fid_files, desc="Loading FID crops", leave=False):
-        with TiffFile(fid_dir / fid_file) as tif:
-            fid_crops.append(tif.asarray())
-    fid_crops = np.concatenate(fid_crops, axis=0)
+    fid_crops = _load_fid_references(fid_dir, subset)
     fid_crops_gts = torch.from_numpy(fid_crops).unsqueeze(1)
     typer.echo(f"Using {fid_crops.shape[0]} crops for FID.")
 
@@ -230,10 +291,16 @@ def compute_metrics(
     )
 
     gt_dir = subset_dir / "test"
+    metric_patch_size = _metric_patch_size(subset)
 
     for image_file in tqdm(image_files, desc="Images", leave=False):
         image_pred = _load_prediction_samples(results_dir / image_file, n_samples)
         image_gt = imread(gt_dir / image_file).astype("float32")[0:1]  # (1, H, W)
+        if subset == "microtubule":
+            image_pred = _crop_microtubule_metric_region(
+                image_pred, results_dir / image_file
+            )
+            image_gt = _crop_microtubule_metric_region(image_gt, gt_dir / image_file)
         mmse_pred = np.mean(image_pred, axis=0, keepdims=True)
 
         # PSNR + MS-SSIM
@@ -248,8 +315,10 @@ def compute_metrics(
             )
         )
 
-        mmse_patches, _ = extract_patches_inner_metrics(mmse_pred, 64)
-        gt_patches, _ = extract_patches_inner_metrics(image_gt, 64)
+        mmse_patches, _ = extract_patches_inner_metrics(
+            mmse_pred, metric_patch_size
+        )
+        gt_patches, _ = extract_patches_inner_metrics(image_gt, metric_patch_size)
         gts.append(torch.from_numpy(gt_patches))
         outputs.append(torch.from_numpy(mmse_patches))
         gts_full.append(torch.from_numpy(image_gt).unsqueeze(1))
@@ -264,7 +333,9 @@ def compute_metrics(
 
         image_fsims, image_lpips_, image_fids_, image_gmsd_ = [], [], [], []
         for j in range(image_pred.shape[0]):
-            pred_patches, _ = extract_patches_inner_metrics(image_pred[j : j + 1], 64)
+            pred_patches, _ = extract_patches_inner_metrics(
+                image_pred[j : j + 1], metric_patch_size
+            )
             torch_pred = torch.from_numpy(pred_patches)[valid]
             image_fsims.append(FSIM(torch_pred, torch_gt_patches))
             image_lpips_.append(lpips(torch_gt_patches, torch_pred))
